@@ -1,13 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
-        casita
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Recolector de Monedas</title>
+
+        <style>
+            body{
+                margin:0;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                height:100vh;
+                background:#1e1e2f;
+                font-family:Arial,sans-serif;
+            }
+
+            #gameContainer{
+                position:relative;
+            }
+
+            canvas{
+                background:#2d3436;
+                border:3px solid white;
+            }
+
+            #score{
+                position:absolute;
+                top:10px;
+                left:10px;
+                color:white;
+                font-size:24px;
+                font-weight:bold;
+            }
+        </style>
     </head>
     <body>
-        <title>Trabajito de programacion de videojuegos</title>
 
-        <title>Bicho gay</title>
+        <div id="gameContainer">
+            <div id="score">Puntos: 0</div>
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
+        </div>
 
-        <p1>GitHub + sourcetree es un metodo muy eficinete al momento de hacer proyectos de programacion para las personas que no tengan mucho conocimiento de la consola de GIT.</p1>
+        <script>
+
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+
+            let score = 0;
+
+            const player = {
+                x:100,
+                y:100,
+                size:30,
+                speed:5
+            };
+
+            const coin = {
+                x:300,
+                y:200,
+                radius:12
+            };
+
+            const keys = {};
+
+            document.addEventListener("keydown",(e)=>{
+                keys[e.key]=true;
+            });
+
+            document.addEventListener("keyup",(e)=>{
+                keys[e.key]=false;
+            });
+
+            function movePlayer(){
+
+                if(keys["ArrowUp"])
+                    player.y -= player.speed;
+
+                if(keys["ArrowDown"])
+                    player.y += player.speed;
+
+                if(keys["ArrowLeft"])
+                    player.x -= player.speed;
+
+                if(keys["ArrowRight"])
+                    player.x += player.speed;
+
+                if(player.x < 0) player.x = 0;
+                if(player.y < 0) player.y = 0;
+
+                if(player.x > canvas.width-player.size)
+                    player.x = canvas.width-player.size;
+
+                if(player.y > canvas.height-player.size)
+                    player.y = canvas.height-player.size;
+            }
+
+            function drawPlayer(){
+                ctx.fillStyle = "#00cec9";
+                ctx.fillRect(player.x,player.y,player.size,player.size);
+            }
+
+            function drawCoin(){
+                ctx.beginPath();
+                ctx.arc(coin.x,coin.y,coin.radius,0,Math.PI*2);
+                ctx.fillStyle = "gold";
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function checkCollision(){
+
+                const dx = (player.x + player.size/2) - coin.x;
+                const dy = (player.y + player.size/2) - coin.y;
+
+                const distance = Math.sqrt(dx*dx + dy*dy);
+
+                if(distance < player.size/2 + coin.radius){
+
+                    score++;
+
+                    document.getElementById("score").textContent =
+                    "Puntos: " + score;
+
+                    coin.x = Math.random() * (canvas.width - 40) + 20;
+                    coin.y = Math.random() * (canvas.height - 40) + 20;
+                }
+            }
+
+            function gameLoop(){
+
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+
+                movePlayer();
+                checkCollision();
+
+                drawPlayer();
+                drawCoin();
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            gameLoop();
+
+        </script>
+
     </body>
 </html>
